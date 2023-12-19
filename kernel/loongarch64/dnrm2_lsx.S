@@ -35,6 +35,7 @@
 
     vxor.v   res1, res1, res1
     vxor.v   res2, res2, res2
+    vxor.v VM0, VM0, VM0
     bge $r0, N, .L999
     beq $r0, INCX, .L999
     move  XX, X
@@ -46,7 +47,7 @@
     slli.d INCX, INCX, BASE_SHIFT
     srai.d I, N, 3
     bne INCX, TEMP, .L20
-    vld VM0, X, 0
+
     bge $r0,  I, .L97
     .align 3
 
@@ -66,15 +67,7 @@
     .align 3
 
 .L20: // INCX!=1
-    move TEMP, X // initialize the maxa value
-    ld.d t1, TEMP, 0 * SIZE
-    add.d TEMP, TEMP, INCX
-    vinsgr2vr.d VM0, t1, 0
-    srai.d I, N, 3
     bge $r0, I, .L97
-    ld.d t2, TEMP, 0 * SIZE
-    add.d TEMP, TEMP, INCX
-    vinsgr2vr.d VM0, t2, 1
     .align 3
 
 .L21:
@@ -154,16 +147,16 @@
 .L110:
     vld VX0, XX, 0 * SIZE
     vld VX1, XX, 2 * SIZE
-    vfmul.d VM0, VX0, VALPHA
-    vfmul.d VM1, VX1, VALPHA
-    vfmadd.d res1, VM0, VM0, res1
-    vfmadd.d res2, VM1, VM1, res2
+    vfmul.d VM2, VX0, VALPHA
+    vfmul.d VM3, VX1, VALPHA
+    vfmadd.d res1, VM2, VM2, res1
+    vfmadd.d res2, VM3, VM3, res2
     vld VX0, XX, 4 * SIZE
     vld VX1, XX, 6 * SIZE
-    vfmul.d VM0, VX0, VALPHA
-    vfmul.d VM1, VX1, VALPHA
-    vfmadd.d res1, VM0, VM0, res1
-    vfmadd.d res2, VM1, VM1, res2
+    vfmul.d VM2, VX0, VALPHA
+    vfmul.d VM3, VX1, VALPHA
+    vfmadd.d res1, VM2, VM2, res1
+    vfmadd.d res2, VM3, VM3, res2
     addi.d XX, XX, 8 * SIZE
     addi.d I, I, -1
     blt $r0, I, .L110
@@ -173,6 +166,7 @@
 .L120:
     srai.d I, N, 3
     bge $r0, I, .L997
+    .align 3
 
 .L121:
     ld.d t1, XX,  0 * SIZE
@@ -187,14 +181,14 @@
     vinsgr2vr.d VX0, t2, 1
     vinsgr2vr.d VX1, t3, 0
     vinsgr2vr.d VX1, t4, 1
-    vfmul.d VM0, VX0, VALPHA
+    vfmul.d VM2, VX0, VALPHA
     ld.d t1, XX, 0 * SIZE
     add.d XX, XX, INCX
-    vfmul.d VM1, VX1, VALPHA
+    vfmul.d VM3, VX1, VALPHA
     ld.d t2, XX, 0 * SIZE
     add.d XX, XX, INCX
-    vfmadd.d res1, VM0, VM0, res1
-    vfmadd.d res2, VM1, VM1, res2
+    vfmadd.d res1, VM2, VM2, res1
+    vfmadd.d res2, VM3, VM3, res2
     ld.d t3, XX, 0 * SIZE
     add.d XX, XX, INCX
     ld.d t4, XX, 0 * SIZE
@@ -203,10 +197,10 @@
     vinsgr2vr.d VX0, t2, 1
     vinsgr2vr.d VX1, t3, 0
     vinsgr2vr.d VX1, t4, 1
-    vfmul.d VM0, VX0, VALPHA
-    vfmul.d VM1, VX1, VALPHA
-    vfmadd.d res1, VM0, VM0, res1
-    vfmadd.d res2, VM1, VM1, res2
+    vfmul.d VM2, VX0, VALPHA
+    vfmul.d VM3, VX1, VALPHA
+    vfmadd.d res1, VM2, VM2, res1
+    vfmadd.d res2, VM3, VM3, res2
     addi.d  I, I, -1
     blt $r0, I, .L121
     b .L996
@@ -230,13 +224,11 @@
     fmadd.d $f19, $f15, $f15, $f19
     add.d XX, XX , INCX
     blt $r0, I, .L998
-    fsqrt.d $f19, $f19
-    fmul.d $f0, max, $f19
-    jirl    $r0, $r1, 0x0
     .align 3
 
 .L999:
-    fmov.d $f0, $f19
+    fsqrt.d $f19, $f19
+    fmul.d $f0, max, $f19
     jirl $r0, $r1, 0x0
 
     EPILOGUE

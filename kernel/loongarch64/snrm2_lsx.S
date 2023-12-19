@@ -15,6 +15,7 @@
 #define VX1    $vr16
 #define VX2    $vr17
 #define VX3    $vr18
+#define VX4    $vr21
 #define res1   $vr19
 #define res2   $vr20
 
@@ -38,23 +39,21 @@
 
 .L10:
    vld VX0, X, 0 * SIZE
-   vld VX1, X, 0 * SIZE
-   vfcvtl.d.s VX0, VX0
-   vfcvth.d.s VX1, VX1
-   vfmadd.d res1, VX0, VX0, res1
-   vfmadd.d res2, VX1, VX1, res2
-   vld VX2, X, 4 * SIZE
-   vld VX3, X, 4 * SIZE
-   vfcvtl.d.s VX2, VX2
-   vfcvth.d.s VX3, VX3
-   vfmadd.d res1, VX2, VX2, res1
-   vfmadd.d res2, VX3, VX3, res2
+   vfcvtl.d.s VX1, VX0
+   vfcvth.d.s VX2, VX0
+   vfmadd.d res1, VX1, VX1, res1
+   vfmadd.d res2, VX2, VX2, res2
+   vld VX0, X, 4 * SIZE
+   vfcvtl.d.s VX3, VX0
+   vfcvth.d.s VX4, VX0
+   vfmadd.d res1, VX3, VX3, res1
+   vfmadd.d res2, VX4, VX4, res2
    addi.d I, I, -1
-   addi.d X, X, 8 * SIZE 
+   addi.d X, X, 8 * SIZE
    blt $r0, I, .L10
    b .L996
    .align 3
-   
+
 
 .L20:
    bge $r0, I, .L997
@@ -68,11 +67,15 @@
    ld.w t3, X, 0 * SIZE
    add.d X, X, INCX
    ld.w t4, X, 0 * SIZE
-   add.d X, X, INCX
    vinsgr2vr.w VX0, t1, 0
    vinsgr2vr.w VX0, t2, 1
    vinsgr2vr.w VX0, t3, 2
-   vinsgr2vr.w VX0, t4, 3  
+   vinsgr2vr.w VX0, t4, 3
+   add.d X, X, INCX
+   vfcvtl.d.s VX1, VX0
+   vfcvth.d.s VX2, VX0
+   vfmadd.d res1, VX1, VX1, res1
+   vfmadd.d res2, VX2, VX2, res2
    ld.w t1, X, 0 * SIZE
    add.d X, X, INCX
    ld.w t2, X, 0 * SIZE
@@ -80,43 +83,15 @@
    ld.w t3, X, 0 * SIZE
    add.d X, X, INCX
    ld.w t4, X, 0 * SIZE
+   vinsgr2vr.w VX0, t1, 0
+   vinsgr2vr.w VX0, t2, 1
+   vinsgr2vr.w VX0, t3, 2
+   vinsgr2vr.w VX0, t4, 3
    add.d X, X, INCX
-   vinsgr2vr.w VX1, t1, 0
-   vinsgr2vr.w VX1, t2, 1
-   vinsgr2vr.w VX1, t3, 2
-   vinsgr2vr.w VX1, t4, 3
-   vfcvtl.d.s VX0, VX0
-   vfcvth.d.s VX1, VX1
-   vfmadd.d res1, VX0, VX0, res1
-   vfmadd.d res2, VX1, VX1, res2
-   ld.w t1, X, 0 * SIZE
-   add.d X, X, INCX
-   ld.w t2, X, 0 * SIZE
-   add.d X, X, INCX
-   ld.w t3, X, 0 * SIZE
-   add.d X, X, INCX
-   ld.w t4, X, 0 * SIZE
-   add.d X, X, INCX
-   vinsgr2vr.w VX2, t1, 0
-   vinsgr2vr.w VX2, t2, 1
-   vinsgr2vr.w VX2, t3, 2
-   vinsgr2vr.w VX2, t4, 3  
-   ld.w t1, X, 0 * SIZE
-   add.d X, X, INCX
-   ld.w t2, X, 0 * SIZE
-   add.d X, X, INCX
-   ld.w t3, X, 0 * SIZE
-   add.d X, X, INCX
-   ld.w t4, X, 0 * SIZE
-   add.d X, X, INCX
-   vinsgr2vr.w VX3, t1, 0
-   vinsgr2vr.w VX3, t2, 1
-   vinsgr2vr.w VX3, t3, 2
-   vinsgr2vr.w VX3, t4, 3
-   vfcvtl.d.s VX2, VX2
-   vfcvth.d.s VX3, VX3
-   vfmadd.d res1, VX2, VX2, res1
-   vfmadd.d res2, VX3, VX3, res2
+   vfcvtl.d.s VX3, VX0
+   vfcvth.d.s VX4, VX0
+   vfmadd.d res1, VX3, VX3, res1
+   vfmadd.d res2, VX4, VX4, res2
    addi.d  I, I, -1
    blt $r0, I, .L21
    b .L996
@@ -124,12 +99,8 @@
 
 .L996:
    vfadd.d res1, res1, res2
-   vreplvei.w VX1, res1, 1
-   vreplvei.w VX2, res1, 2
-   vreplvei.w VX3, res1, 3
-   vfadd.s res1, VX1, res1
-   vfadd.s res1, VX2, res1
-   vfadd.s res1, VX3, res1
+   vreplvei.d VX1, res1, 1
+   vfadd.d res1, VX1, res1
    .align 3
 
 .L997:

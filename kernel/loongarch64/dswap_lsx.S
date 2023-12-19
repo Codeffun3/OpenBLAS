@@ -167,7 +167,7 @@
     vstelm.d VX2, X, 0, 1
     vinsgr2vr.d VX0, t1, 0
     vinsgr2vr.d VX0, t2, 1
-    add.d X, X, INCY
+    add.d X, X, INCX
     vst VX0, Y, 0 * SIZE
     vld VX3, Y, 2 * SIZE
     ld.d t3, X, 0 * SIZE
@@ -187,7 +187,7 @@
     vstelm.d VX2, X, 0, 1
     vinsgr2vr.d VX0, t1, 0
     vinsgr2vr.d VX0, t2, 1
-    add.d X, X, INCY
+    add.d X, X, INCX
     vst VX0, Y, 4 * SIZE
     vld VX3, Y, 6 * SIZE
     ld.d t3, X, 0 * SIZE
@@ -222,13 +222,6 @@
     .align 3
 
 .L22:
-    bgez INCX, .L220
-    //addi.d TEMP, N, -1
-    //mul.d TEMP, TEMP, INCX
-    //sub.d X, X, TEMP
-    .align 3
-
-.L220:
     bge $r0, I, .L223
     .align 3
     move XX, X

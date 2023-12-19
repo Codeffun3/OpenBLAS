@@ -98,11 +98,8 @@
     vfcmp.clt.s VT0, VM0, VM1
     vbitsel.v VM0, VM0, VM1, VT0
     vbitsel.v VI0, VINC8, VINC4, VT0
-    li.d TEMP, 1 //处理尾数相等时取最小序号
-    movgr2fr.w $f17, TEMP
-    ffint.s.w $f17, $f17
-    vfcmp.ceq.s VT0, VM0, x1
-    fcmp.ceq.s $fcc0, $f23, $f17
+    //处理尾数相等时取最小序号
+    fcmp.ceq.d $fcc0, $f15, $f9
     bceqz $fcc0, .L26
     vfcmp.clt.s VT0, VI1, VI0
     vbitsel.v VI0, VI0, VI1, VT0
@@ -203,35 +200,29 @@
     vfcmp.clt.s VT0, VM0, VM1
     vbitsel.v VM0, VM0, VM1, VT0
     vbitsel.v VI0, VINC8, VINC4, VT0
-    li.d TEMP, 1 //处理尾数相等时取最小序号
-    movgr2fr.w $f17, TEMP
-    ffint.s.w $f17, $f17
-    vfcmp.ceq.s VT0, VM0, x1
-    fcmp.ceq.s $fcc0, $f23, $f17
+    //处理尾数相等时取最小序号
+    fcmp.ceq.d $fcc0, $f15, $f9
     bceqz $fcc0, .L26
     vfcmp.clt.s VT0, VI1, VI0
     vbitsel.v VI0, VI0, VI1, VT0
     .align 3
 
 .L26:
-    vfcmp.ceq.s VT0, VM0, x2
-    fcmp.ceq.s $fcc0, $f23, $f17
+    fcmp.ceq.d $fcc0, $f15, $f10
     bceqz $fcc0, .L27
     vfcmp.clt.s VT0, VI2, VI0
     vbitsel.v VI0, VI0, VI2, VT0
     .align 3
 
 .L27:
-    vfcmp.ceq.s VT0, VM0, x3
-    fcmp.ceq.s $fcc0, $f23, $f17
+    fcmp.ceq.d $fcc0, $f15, $f11
     bceqz $fcc0, .L28
     vfcmp.clt.s VT0, VI3, VI0
     vbitsel.v VI0, VI0, VI3, VT0
     .align 3
 
 .L28:
-    vfcmp.ceq.s VT0, VM0, x4
-    fcmp.ceq.s $fcc0, $f23, $f17
+    fcmp.ceq.d $fcc0, $f15, $f12
     bceqz $fcc0, .L29
     vfcmp.clt.s VT0, VI4, VI0
     vbitsel.v VI0, VI0, VI4, VT0

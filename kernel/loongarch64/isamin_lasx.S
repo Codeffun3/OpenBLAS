@@ -112,11 +112,8 @@
     xvfmina.s VM0, VM0, VM1
     xvfcmp.ceq.s VT0, VM0, VM1
     xvbitsel.v VI0, VINC8, VINC4, VT0
-    li.d TEMP, 1 //处理尾数相等时取最小序号
-    movgr2fr.w $f17, TEMP
-    ffint.s.w $f17, $f17
-    xvfcmp.ceq.s VT0, VM0, x1
-    fcmp.ceq.s $fcc0, $f23, $f17
+    //处理尾数相等时取最小序号
+    fcmp.ceq.d $fcc0, $f15, $f9
     bceqz $fcc0, .L26
     xvfcmp.clt.s VT0, VI1, VI0
     xvbitsel.v VI0, VI0, VI1, VT0
@@ -245,35 +242,29 @@
     xvfcmp.ceq.s VT0, VM0, VM1
     xvbitsel.v VM0, VM0, VM1, VT0
     xvbitsel.v VI0, VINC8, VINC4, VT0
-    li.d TEMP, 1 //处理尾数相等时取最小序号
-    movgr2fr.w $f17, TEMP
-    ffint.s.w $f17, $f17
-    xvfcmp.ceq.s VT0, VM0, x1
-    fcmp.ceq.s $fcc0, $f23, $f17
+    //处理尾数相等时取最小序号
+    fcmp.ceq.d $fcc0, $f15, $f9
     bceqz $fcc0, .L26
     xvfcmp.clt.s VT0, VI1, VI0
     xvbitsel.v VI0, VI0, VI1, VT0
     .align 3
 
 .L26:
-    xvfcmp.ceq.s VT0, VM0, x2
-    fcmp.ceq.s $fcc0, $f23, $f17
+    fcmp.ceq.d $fcc0, $f15, $f10
     bceqz $fcc0, .L27
     xvfcmp.clt.s VT0, VI2, VI0
     xvbitsel.v VI0, VI0, VI2, VT0
     .align 3
 
 .L27:
-    xvfcmp.ceq.s VT0, VM0, x3
-    fcmp.ceq.s $fcc0, $f23, $f17
+    fcmp.ceq.d $fcc0, $f15, $f11
     bceqz $fcc0, .L28
     xvfcmp.clt.s VT0, VI3, VI0
     xvbitsel.v VI0, VI0, VI3, VT0
     .align 3
 
 .L28:
-    xvfcmp.ceq.s VT0, VM0, x4
-    fcmp.ceq.s $fcc0, $f23, $f17
+    fcmp.ceq.d $fcc0, $f15, $f12
     bceqz $fcc0, .L29
     xvfcmp.clt.s VT0, VI4, VI0
     xvbitsel.v VI0, VI0, VI4, VT0
@@ -306,35 +297,29 @@
     xvfmina.s VM0, VM0, VM1
     xvfcmp.ceq.s VT0, VM0, VM1
     xvbitsel.v VI0, VINC8, VINC4, VT0
-    li.d TEMP, 1 //处理尾数相等时取最小序号
-    movgr2fr.w $f17, TEMP
-    ffint.s.w $f17, $f17
-    xvfcmp.ceq.s VT0, VM0, x1
-    fcmp.ceq.s $fcc0, $f23, $f17
+    //处理尾数相等时取最小序号
+    fcmp.ceq.d $fcc0, $f15, $f9
     bceqz $fcc0, .L262
     xvfcmp.clt.s VT0, VI1, VI0
     xvbitsel.v VI0, VI0, VI1, VT0
     .align 3
 
 .L262:
-    xvfcmp.ceq.s VT0, VM0, x2
-    fcmp.ceq.s $fcc0, $f23, $f17
+    fcmp.ceq.d $fcc0, $f15, $f10
     bceqz $fcc0, .L272
     xvfcmp.clt.s VT0, VI2, VI0
     xvbitsel.v VI0, VI0, VI2, VT0
     .align 3
 
 .L272:
-    xvfcmp.ceq.s VT0, VM0, x3
-    fcmp.ceq.s $fcc0, $f23, $f17
+    fcmp.ceq.d $fcc0, $f15, $f11
     bceqz $fcc0, .L282
     xvfcmp.clt.s VT0, VI3, VI0
     xvbitsel.v VI0, VI0, VI3, VT0
     .align 3
 
 .L282:
-    xvfcmp.ceq.s VT0, VM0, x4
-    fcmp.ceq.s $fcc0, $f23, $f17
+    fcmp.ceq.d $fcc0, $f15, $f12
     bceqz $fcc0, .L292
     xvfcmp.clt.s VT0, VI4, VI0
     xvbitsel.v VI0, VI0, VI4, VT0

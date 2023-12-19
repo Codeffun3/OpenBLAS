@@ -87,14 +87,11 @@
     vreplvei.d VI2, VI0, 1
     vreplvei.d x1, VM0, 0
     vreplvei.d x2, VM0, 1
-    li.d TEMP, 1 //处理尾数相等时取最小序号
-    movgr2fr.d $f17, TEMP
-    ffint.d.l $f17, $f17
-    vfcmp.ceq.d VT0, x2, x1
-    fcmp.ceq.d $fcc0, $f23, $f17
+    //处理尾数相等时取最小序号
+    fcmp.ceq.d $fcc0, $f10, $f9
     bceqz $fcc0, .L26
-    vfcmp.clt.d VT0, VI1, VI0
-    vbitsel.v VI0, VI0, VI1, VT0
+    vfcmp.clt.d VT0, VI1, VI2
+    vbitsel.v VI0, VI2, VI1, VT0
     b .L27
     .align 3
 
@@ -173,14 +170,11 @@
     vreplvei.d VI2, VI0, 1
     vreplvei.d x1, VM0, 0
     vreplvei.d x2, VM0, 1
-    li.d TEMP, 1 //处理尾数相等时取最小序号
-    movgr2fr.d $f17, TEMP
-    ffint.d.l $f17, $f17
-    vfcmp.ceq.d VT0, x2, x1
-    fcmp.ceq.d $fcc0, $f23, $f17
+    //处理尾数相等时取最小序号
+    fcmp.ceq.d $fcc0, $f10, $f9
     bceqz $fcc0, .L26
-    vfcmp.clt.d VT0, VI1, VI0
-    vbitsel.v VI0, VI0, VI1, VT0
+    vfcmp.clt.d VT0, VI1, VI2
+    vbitsel.v VI0, VI2, VI1, VT0
     b .L27
     .align 3
 

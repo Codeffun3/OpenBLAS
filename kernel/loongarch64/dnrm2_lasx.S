@@ -35,6 +35,7 @@
 
     xvxor.v   res1, res1, res1
     xvxor.v   res2, res2, res2
+    xvxor.v VM0, VM0, VM0
     bge $r0, N, .L999
     beq $r0, INCX, .L999
     move  XX, X
@@ -46,7 +47,6 @@
     slli.d INCX, INCX, BASE_SHIFT
     srai.d I, N, 3
     bne INCX, TEMP, .L20
-    xvld VM0, X, 0
     bge $r0,  I, .L97
     .align 3
 
@@ -62,15 +62,7 @@
     .align 3
 
 .L20: // INCX!=1
-    move TEMP, X // initialize the maxa value
-    ld.d t1, TEMP, 0 * SIZE
-    add.d TEMP, TEMP, INCX
-    xvinsgr2vr.d VM0, t1, 0
-    srai.d I, N, 3
     bge $r0, I, .L97
-    ld.d t2, TEMP, 0 * SIZE
-    add.d TEMP, TEMP, INCX
-    xvinsgr2vr.d VM0, t2, 1
     .align 3
 
 .L21:
@@ -151,10 +143,10 @@
 .L110:
     xvld VX0, XX, 0 * SIZE
     xvld VX1, XX, 4 * SIZE
-    xvfmul.d VM0, VX0, VALPHA
-    xvfmul.d VM1, VX1, VALPHA
-    xvfmadd.d res1, VM0, VM0, res1
-    xvfmadd.d res2, VM1, VM1, res2
+    xvfmul.d VM2, VX0, VALPHA
+    xvfmul.d VM3, VX1, VALPHA
+    xvfmadd.d res1, VM2, VM2, res1
+    xvfmadd.d res2, VM3, VM3, res2
     addi.d XX, XX, 8 * SIZE
     addi.d I, I, -1
     blt $r0, I, .L110
@@ -186,14 +178,14 @@
     add.d XX, XX, INCX
     ld.d t4, XX, 0 * SIZE
     add.d XX, XX, INCX
-    xvinsgr2vr.d VX0, t1, 0
-    xvinsgr2vr.d VX0, t2, 1
+    xvinsgr2vr.d VX1, t1, 0
+    xvinsgr2vr.d VX1, t2, 1
     xvinsgr2vr.d VX1, t3, 2
     xvinsgr2vr.d VX1, t4, 3
-    xvfmul.d VM0, VX0, VALPHA
-    xvfmul.d VM1, VX1, VALPHA
-    xvfmadd.d res1, VM0, VM0, res1
-    xvfmadd.d res2, VM1, VM1, res2
+    xvfmul.d VM2, VX0, VALPHA
+    xvfmul.d VM3, VX1, VALPHA
+    xvfmadd.d res1, VM2, VM2, res1
+    xvfmadd.d res2, VM3, VM3, res2
     addi.d  I, I, -1
     blt $r0, I, .L121
     b .L996
@@ -203,9 +195,9 @@
     xvfadd.d res1, res1, res2
     xvpickve.d VX0, res1, 1
     xvpickve.d VX1, res1, 2
-    xvpickve.d VM0, res1, 3
+    xvpickve.d VM2, res1, 3
     xvfadd.d res1, VX0, res1
-    xvfadd.d VX1, VX1, VM0
+    xvfadd.d VX1, VX1, VM2
     xvfadd.d res1, VX1, res1
     .align 3
 
@@ -221,13 +213,11 @@
     fmadd.d $f19, $f15, $f15, $f19
     add.d XX, XX , INCX
     blt $r0, I, .L998
-    fsqrt.d $f19, $f19
-    fmul.d $f0, max, $f19
-    jirl    $r0, $r1, 0x0
-    .align 3
 
 .L999:
-    fmov.d $f0, $f19
+    fsqrt.d $f19, $f19
+    fmul.d $f0, max, $f19
     jirl $r0, $r1, 0x0
+    .align 3
 
     EPILOGUE

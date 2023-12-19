@@ -428,7 +428,9 @@
     vstelm.d VXZ, YY, 0, 1
     add.d YY, YY, INCY
     addi.d  I, I, -1
+    addi.d X, X, 8 * SIZE
     blt $r0, I, .L124
+    move Y, YY
     b .L997
     .align 3
 
@@ -670,6 +672,7 @@
     addi.d Y, Y, 8 * SIZE
     addi.d  I, I, -1
     blt $r0, I, .L211
+    move X, XX
     b .L997
     .align 3
 
@@ -1019,6 +1022,8 @@
     add.d YY, YY, INCY
     addi.d  I, I, -1
     blt $r0, I, .L224
+    move X, XX
+    move Y, YY
     b .L997
     .align 3
 

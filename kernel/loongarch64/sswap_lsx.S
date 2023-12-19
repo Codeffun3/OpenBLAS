@@ -153,7 +153,7 @@
     add.d X, X, INCX
     ld.w t2, X, 0 * SIZE
     vstelm.w VX2, X, 0, 1
-    add.d X, X, INCY
+    add.d X, X, INCX
     ld.w t3, X, 0 * SIZE
     vstelm.w VX2, X, 0, 2
     add.d X, X, INCX
@@ -168,7 +168,7 @@
     vld VX3, Y, 4 * SIZE
     ld.w t1, X, 0 * SIZE
     vstelm.w VX3, X, 0, 0
-    add.d X, X, INCY
+    add.d X, X, INCX
     ld.w t2, X, 0 * SIZE
     vstelm.w VX3, X, 0, 1
     add.d X, X, INCX
@@ -182,7 +182,7 @@
     vinsgr2vr.w VX1, t3, 2
     vinsgr2vr.w VX1, t4, 3
     add.d X, X, INCX
-    vst VX1, Y, 0 * SIZE
+    vst VX1, Y, 4 * SIZE
     addi.d Y, Y, 8 * SIZE
     addi.d  I, I, -1
     blt $r0, I, .L211

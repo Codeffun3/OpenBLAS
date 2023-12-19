@@ -1,0 +1,271 @@
+#define ASSEMBLER
+
+#include "common.h"
+
+#define N $r4
+#define X $r5
+#define INCX $r6
+#define I $r12
+#define t1 $r13
+#define t2 $r15
+#define t3 $r18
+#define t4 $r16
+#define i0 $r17
+#define i1 $r14
+#define TEMP $r19
+#define a0 $f12
+#define a1 $f13
+#define s1 $f15
+#define x1 $vr9
+#define x2 $vr10
+#define x3 $vr11
+#define x4 $vr12
+#define VX0 $vr13
+#define VX1 $vr14
+#define VM0 $vr15
+#define VM1 $vr16
+#define VINC4 $vr17
+#define VINC8 $vr18
+#define VI0 $vr20
+#define VI1 $vr21
+#define VI2 $vr22
+#define VI3 $vr8
+#define VI4 $vr19
+#define VT0 $vr23
+
+    PROLOGUE
+    li.d  i0, 0
+    bge $r0, N, .L999
+    bge $r0, INCX, .L999
+    li.d TEMP, 1
+    slli.d TEMP, TEMP, ZBASE_SHIFT
+    slli.d INCX, INCX, ZBASE_SHIFT
+    fld.s a0, X, 0 * SIZE
+    fld.s a1, X, 1 * SIZE
+    fabs.s a0, a0
+    fabs.s a1, a1
+    fadd.s s1, a1, a0
+    vreplvei.w VM0, VM0, 0
+    vxor.v VI3, VI3, VI3 // 0
+    li.w I, -1
+    vreplgr2vr.w VI4, I
+    vffint.s.w VI4, VI4 // -1
+    bne INCX, TEMP, .L20
+    addi.w i0, i0, 1
+    srai.d I, N, 2
+    bge $r0, I, .L21
+    slli.w i0, i0, 2 //4
+    vreplgr2vr.w VINC4, i0
+    addi.w i0, i0, -7
+    vinsgr2vr.w VI1, i0, 0 //initialize the index value for vectorization
+    addi.w i0, i0, 1
+    vinsgr2vr.w VI1, i0, 1
+    addi.w i0, i0, 1
+    vinsgr2vr.w VI1, i0, 2
+    addi.w i0, i0, 1
+    vinsgr2vr.w VI1, i0, 3
+    addi.w i0, i0, 1
+    vinsgr2vr.w VI0, i0, 0 //1
+    addi.w i0, i0, 1
+    vinsgr2vr.w VI0, i0, 1 //2
+    addi.w i0, i0, 1
+    vinsgr2vr.w VI0, i0, 2 //3
+    addi.w i0, i0, 1
+    vinsgr2vr.w VI0, i0, 3 //4
+    .align 3
+
+.L10:
+    vld VX0, X, 0 * SIZE
+    vadd.w VI1, VI1, VINC4
+    vld VX1, X, 4 * SIZE
+    addi.d I, I, -1
+    vpickev.w x1, VX1, VX0
+    vpickod.w x2, VX1, VX0
+    vfmul.s x3, VI4, x1
+    vfmul.s x4, VI4, x2
+    vfcmp.clt.s VT0, x1, VI3
+    vfcmp.clt.s VINC8, x2, VI3
+    vbitsel.v x1, x1, x3, VT0
+    vbitsel.v x2, x2, x4, VINC8
+    vfadd.s x1, x1, x2
+    vfmin.s x3, VM0, x1
+    vfcmp.ceq.s VT0, x3, VM0
+    addi.d X, X, 8 * SIZE
+    vbitsel.v VM0, x3, VM0, VT0
+    vbitsel.v VI0, VI1, VI0, VT0
+    blt $r0, I, .L10
+    .align 3
+
+.L15:
+    vreplvei.w VI1, VI0, 0
+    vreplvei.w VI2, VI0, 1
+    vreplvei.w VI3, VI0, 2
+    vreplvei.w VI4, VI0, 3
+    vreplvei.w x1, VM0, 0
+    vreplvei.w x2, VM0, 1
+    vreplvei.w x3, VM0, 2
+    vreplvei.w x4, VM0, 3
+    vfmina.s VM1, x1, x2
+    vfcmp.ceq.s VT0, VM1, x1
+    vbitsel.v VINC4, VI2, VI1, VT0
+    vfmina.s VM0, x3, x4
+    vfcmp.ceq.s VT0, x3, VM0
+    vbitsel.v VINC8, VI4, VI3, VT0
+    vfmina.s VM0, VM0, VM1
+    vfcmp.ceq.s VT0, VM0, VM1
+    vbitsel.v VI0, VINC8, VINC4, VT0
+    //处理尾数相等时取最小序号
+    fcmp.ceq.d $fcc0, $f15, $f9
+    bceqz $fcc0, .L26
+    vfcmp.clt.s VT0, VI1, VI0
+    vbitsel.v VI0, VI0, VI1, VT0
+    b .L26
+    .align 3
+
+.L20: // INCX!=1
+    addi.w i0, i0, 1
+    srai.d I, N, 2
+    bge $r0, I, .L21
+    slli.w i0, i0, 2 //4
+    vreplgr2vr.w VINC4, i0
+    addi.w i0, i0, -7
+    vinsgr2vr.w VI1, i0, 0 //initialize the index value for vectorization
+    addi.w i0, i0, 1
+    vinsgr2vr.w VI1, i0, 1
+    addi.w i0, i0, 1
+    vinsgr2vr.w VI1, i0, 2
+    addi.w i0, i0, 1
+    vinsgr2vr.w VI1, i0, 3
+    addi.w i0, i0, 1
+    vinsgr2vr.w VI0, i0, 0 //1
+    addi.w i0, i0, 1
+    vinsgr2vr.w VI0, i0, 1 //2
+    addi.w i0, i0, 1
+    vinsgr2vr.w VI0, i0, 2 //3
+    addi.w i0, i0, 1
+    vinsgr2vr.w VI0, i0, 3 //4
+    .align 3
+
+.L24:
+    ld.w t1, X, 0 * SIZE
+    ld.w t2, X, 1 * SIZE
+    add.d X, X, INCX
+    ld.w t3, X, 0 * SIZE
+    ld.w t4, X, 1 * SIZE
+    add.d X, X, INCX
+    vinsgr2vr.w x1, t1, 0
+    vinsgr2vr.w x2, t2, 0
+    vinsgr2vr.w x1, t3, 1
+    vinsgr2vr.w x2, t4, 1
+    vadd.w VI1, VI1, VINC4
+    ld.w t1, X, 0 * SIZE
+    ld.w t2, X, 1 * SIZE
+    add.d X, X, INCX
+    ld.w t3, X, 0 * SIZE
+    ld.w t4, X, 1 * SIZE
+    add.d X, X, INCX
+    vinsgr2vr.w x1, t1, 2
+    vinsgr2vr.w x2, t2, 2
+    vinsgr2vr.w x1, t3, 3
+    vinsgr2vr.w x2, t4, 3
+    addi.d I, I, -1
+    vpickev.w x1, VX1, VX0
+    vpickod.w x2, VX1, VX0
+    vfmul.s x3, VI4, x1
+    vfmul.s x4, VI4, x2
+    vfcmp.clt.s VT0, x1, VI3
+    vfcmp.clt.s VINC8, x2, VI3
+    vbitsel.v x1, x1, x3, VT0
+    vbitsel.v x2, x2, x4, VINC8
+    vfadd.s x1, x1, x2
+    vfmin.s x3, VM0, x1
+    vfcmp.ceq.s VT0, x3, VM0
+    vbitsel.v VM0, x3, VM0, VT0
+    vbitsel.v VI0, VI1, VI0, VT0
+    blt $r0, I, .L24
+    .align 3
+
+.L25:
+    vreplvei.w VI1, VI0, 0
+    vreplvei.w VI2, VI0, 1
+    vreplvei.w VI3, VI0, 2
+    vreplvei.w VI4, VI0, 3
+    vreplvei.w x1, VM0, 0
+    vreplvei.w x2, VM0, 1
+    vreplvei.w x3, VM0, 2
+    vreplvei.w x4, VM0, 3
+    vfmina.s VM1, x1, x2
+    vfcmp.ceq.s VT0, VM1, x1
+    vbitsel.v VINC4, VI2, VI1, VT0
+    vfmina.s VM0, x3, x4
+    vfcmp.ceq.s VT0, x3, VM0
+    vbitsel.v VINC8, VI4, VI3, VT0
+    vfmina.s VM0, VM0, VM1
+    vfcmp.ceq.s VT0, VM0, VM1
+    vbitsel.v VI0, VINC8, VINC4, VT0
+    //处理尾数相等时取最小序号
+    fcmp.ceq.d $fcc0, $f15, $f9
+    bceqz $fcc0, .L26
+    vfcmp.clt.s VT0, VI1, VI0
+    vbitsel.v VI0, VI0, VI1, VT0
+    .align 3
+
+.L26:
+    fcmp.ceq.d $fcc0, $f15, $f10
+    bceqz $fcc0, .L27
+    vfcmp.clt.s VT0, VI2, VI0
+    vbitsel.v VI0, VI0, VI2, VT0
+    .align 3
+
+.L27:
+    fcmp.ceq.d $fcc0, $f15, $f11
+    bceqz $fcc0, .L28
+    vfcmp.clt.s VT0, VI3, VI0
+    vbitsel.v VI0, VI0, VI3, VT0
+    .align 3
+
+.L28:
+    fcmp.ceq.d $fcc0, $f15, $f12
+    bceqz $fcc0, .L29
+    vfcmp.clt.s VT0, VI4, VI0
+    vbitsel.v VI0, VI0, VI4, VT0
+    .align 3
+
+.L29:
+    movfr2gr.s i0, $f20
+    .align 3
+
+.L21: //N<4
+    andi I, N, 3
+    bge $r0, I, .L999
+    srai.d i1, N, 2
+    slli.d i1, i1, 2
+    addi.d i1, i1, 1 //current index
+    movgr2fr.d $f21, i1
+    movgr2fr.d $f20, i0
+    .align 3
+
+.L22:
+    LD a0, X, 0 * SIZE
+    LD a1, X, 1 * SIZE
+    addi.d I, I, -1
+    FABS a0, a0
+    FABS a1, a1
+    ADD a0, a0, a1
+    fmin.s a1, s1, a0
+    fcmp.ceq.s $fcc0, s1, a1
+    add.d  X, X, INCX
+    fsel s1, a1, s1, $fcc0
+    fsel $f20, $f21, $f20, $fcc0
+    addi.d i1, i1, 1
+    movgr2fr.d $f21, i1
+    blt $r0, I, .L22
+    movfr2gr.s i0, $f20
+    .align 3
+
+.L999:
+    move $r4, $r17
+    jirl $r0, $r1, 0x0
+    .align 3
+
+    EPILOGUE

@@ -168,7 +168,7 @@
     xvld VX3, Y, 4 * SIZE
     ld.d t1, X, 0 * SIZE
     xvstelm.d VX3, X, 0, 0
-    add.d X, X, INCY
+    add.d X, X, INCX
     ld.d t2, X, 0 * SIZE
     xvstelm.d VX3, X, 0, 1
     add.d X, X, INCX
@@ -182,7 +182,7 @@
     xvinsgr2vr.d VX1, t3, 2
     xvinsgr2vr.d VX1, t4, 3
     add.d X, X, INCX
-    xvst VX1, Y, 0 * SIZE
+    xvst VX1, Y, 4 * SIZE
     addi.d Y, Y, 8 * SIZE
     addi.d  I, I, -1
     blt $r0, I, .L211

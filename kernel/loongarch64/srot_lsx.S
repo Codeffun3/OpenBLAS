@@ -352,6 +352,7 @@
     vstelm.w VXZ, YY, 0, 3
     add.d YY, YY, INCY
     addi.d  I, I, -1
+    addi.d X, X, 8 * SIZE
     blt $r0, I, .L124
     b .L997
     .align 3

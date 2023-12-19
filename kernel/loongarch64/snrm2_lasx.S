@@ -15,6 +15,7 @@
 #define VX1    $xr16
 #define VX2    $xr17
 #define VX3    $xr18
+#define VX4    $xr21
 #define res1   $xr19
 #define res2   $xr20
 
@@ -38,13 +39,12 @@
 
 .L10:
    xvld VX0, X, 0 * SIZE
-   xvld VX1, X, 0 * SIZE
-   xvfcvtl.d.s VX0, VX0
-   xvfcvth.d.s VX1, VX1
-   xvfmadd.d res1, VX0, VX0, res1
-   xvfmadd.d res2, VX1, VX1, res2
+   xvfcvtl.d.s VX1, VX0
+   xvfcvth.d.s VX2, VX0
+   xvfmadd.d res1, VX1, VX1, res1
+   xvfmadd.d res2, VX2, VX2, res2
    addi.d I, I, -1
-   addi.d X, X, 8 * SIZE 
+   addi.d X, X, 8 * SIZE
    blt $r0, I, .L10
    .align 3
    b .L996
@@ -73,51 +73,27 @@
    ld.w t3, X, 0 * SIZE
    add.d X, X, INCX
    ld.w t4, X, 0 * SIZE
-   add.d X, X, INCX
    xvinsgr2vr.w VX0, t1, 4
    xvinsgr2vr.w VX0, t2, 5
    xvinsgr2vr.w VX0, t3, 6
    xvinsgr2vr.w VX0, t4, 7
-   ld.w t1, X, 0 * SIZE
    add.d X, X, INCX
-   ld.w t2, X, 0 * SIZE
-   add.d X, X, INCX
-   ld.w t3, X, 0 * SIZE
-   add.d X, X, INCX
-   ld.w t4, X, 0 * SIZE
-   add.d X, X, INCX
-   xvinsgr2vr.w VX1, t1, 0
-   xvinsgr2vr.w VX1, t2, 1
-   xvinsgr2vr.w VX1, t3, 2
-   xvinsgr2vr.w VX1, t4, 3
-   ld.w t1, X, 0 * SIZE
-   add.d X, X, INCX
-   ld.w t2, X, 0 * SIZE
-   add.d X, X, INCX
-   ld.w t3, X, 0 * SIZE
-   add.d X, X, INCX
-   ld.w t4, X, 0 * SIZE
-   add.d X, X, INCX
-   xvinsgr2vr.w VX1, t1, 4
-   xvinsgr2vr.w VX1, t2, 5
-   xvinsgr2vr.w VX1, t3, 6
-   xvinsgr2vr.w VX1, t4, 7
-   xvfcvtl.d.s VX0, VX0
-   xvfcvth.d.s VX1, VX1
-   xvfmadd.d res1, VX0, VX0, res1
-   xvfmadd.d res2, VX1, VX1, res2
+   xvfcvtl.d.s VX1, VX0
+   xvfcvth.d.s VX2, VX0
+   xvfmadd.d res1, VX1, VX1, res1
+   xvfmadd.d res2, VX2, VX2, res2
    addi.d  I, I, -1
    blt $r0, I, .L21
    b .L996
 
 .L996:
    xvfadd.d res1, res1, res2
-   xvpickve.w VX1, res1, 1
-   xvpickve.w VX2, res1, 2
-   xvpickve.w VX3, res1, 3
-   xvfadd.s res1, VX1, res1
-   xvfadd.s res1, VX2, res1
-   xvfadd.s res1, VX3, res1
+   xvpickve.d VX1, res1, 1
+   xvpickve.d VX2, res1, 2
+   xvpickve.d VX3, res1, 3
+   xvfadd.d res1, VX1, res1
+   xvfadd.d res1, VX2, res1
+   xvfadd.d res1, VX3, res1
    .align 3
 
 .L997:
